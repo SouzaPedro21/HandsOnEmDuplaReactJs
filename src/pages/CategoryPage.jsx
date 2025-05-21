@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import categoryService from "@services/categoryService"; // Certifique-se de ter esse service implementado
+import { Link } from 'react-router-dom';
 
 const initialCategory = {
   category_name: "",
@@ -9,6 +10,15 @@ const initialCategory = {
 
 const CategoryPage = () => {
   const queryClient = useQueryClient();
+  const [currentPage, setCurrentPage] = useState(1);
+  const CATEGORIES_PER_PAGE = 12;
+
+  // Buscar categorias existentes
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ['categories', currentPage],
+    queryFn: () => categoryService.getCategoriesByPage(currentPage, CATEGORIES_PER_PAGE),
+    keepPreviousData: true,
+  });
 
   const [category, setCategory] = useState(initialCategory);
   const [errors, setErrors] = useState({});
@@ -61,55 +71,81 @@ const CategoryPage = () => {
     }
   };
 
-  return (
-    <div className="row justify-content-center">
-      <div className="col-md-8">
-        <div className="card">
-          <div className="card-header text-bg-dark">
-            <h2 className="mb-0">Cadastrar Nova Categoria</h2>
-          </div>
-          <div className="card-body">
-            <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <label htmlFor="category_name" className="form-label">
-                  Nome da Categoria
-                </label>
-                <input
-                  type="text"
-                  className={`form-control ${errors.category_name ? "is-invalid" : ""}`}
-                  id="category_name"
-                  name="category_name"
-                  value={category.category_name}
-                  onChange={handleChange}
-                />
-                {errors.category_name && (
-                  <div className="invalid-feedback">{errors.category_name}</div>
-                )}
-              </div>
-              <div className="d-flex">
-                <button
-                  type="submit"
-                  className="btn btn-success me-2"
-                  disabled={createCategoryMutation.isLoading}
-                >
-                  {createCategoryMutation.isLoading ? (
-                    <>
-                      <span
-                        className="spinner-border spinner-border-sm me-2"
-                        role="status"
-                        aria-hidden="true"
-                      ></span>
-                      Salvando...
-                    </>
-                  ) : (
-                    "Cadastrar Categoria"
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
+  if (isLoading) {
+    return (
+      <div className="text-center my-5">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Carregando...</span>
         </div>
+        <p className="mt-2">Carregando categorias...</p>
       </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="alert alert-danger" role="alert">
+        <i className="bi bi-exclamation-triangle me-2"></i>
+        Erro ao carregar categorias: {error.message}
+      </div>
+    );
+  }
+
+  const { categories, totalPages } = data;
+
+  return (
+    <div className="container">
+      <h1 className="mb-4">Categorias</h1>
+      
+      <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {categories.map((category) => (
+          <div key={category.id} className="col">
+            <div className="card h-100">
+              <div className="card-body">
+                <h5 className="card-title">{category.category_name}</h5>
+                <Link to={`/products?category=${category.id}`} className="btn btn-primary">
+                  Ver Produtos
+                </Link>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {totalPages > 1 && (
+        <nav className="mt-4">
+          <ul className="pagination justify-content-center">
+            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+              <button
+                className="page-link"
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+              >
+                Anterior
+              </button>
+            </li>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <li key={i + 1} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
+                <button
+                  className="page-link"
+                  onClick={() => setCurrentPage(i + 1)}
+                >
+                  {i + 1}
+                </button>
+              </li>
+            ))}
+            <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+              <button
+                className="page-link"
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Próxima
+              </button>
+            </li>
+          </ul>
+        </nav>
+      )}
     </div>
   );
 };

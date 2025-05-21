@@ -1,4 +1,5 @@
 import supabase from './supabase';
+import { toast } from 'react-hot-toast';
 
 const categoryService = {
   async getCategoriesByPage(page = 1, limit = 12) {
@@ -23,29 +24,28 @@ const categoryService = {
 
   // Criar categoria
   async createCategory(category) {
-    const { data, error } = await supabase
+    console.log('Tentando inserir categoria:', category);
+    const { error } = await supabase
       .from('product_category')
-      .insert([category])
-      .select();
+      .insert([{ category_name: category.category_name }], { returning: 'minimal' });
     if (error) {
       console.error('Erro ao criar categoria:', error);
       throw error;
     }
-    return data[0];
+    return true;
   },
 
   // Atualizar categoria
   async updateCategory(id, category) {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('product_category')
       .update(category)
-      .eq('id', id)
-      .select();
+      .eq('id', id);
     if (error) {
       console.error('Erro ao atualizar categoria:', error);
       throw error;
     }
-    return data[0];
+    return true;
   },
 
   // Deletar categoria

@@ -6,6 +6,7 @@ import Footer from "@components/Footer";
 import Header from "@components/Header";
 import HomePage from '@pages/HomePage';
 import ProductsPage from '@pages/ProductsPage';
+import CategoryPage from '@pages/CategoryPage';
 import AdminCreateProductPage from '@pages/admin/AdminCreateProductPage';
 import AdminUsersPage from '@pages/admin/AdminUsersPage';
 import AdminRoute from '@components/AdminRoute';
@@ -54,6 +55,9 @@ function App() {
               path="/products"
               element={<ProductsPage onAddToCart={handleAddToCart} />} />
             <Route
+              path="/categories"
+              element={<CategoryPage />} />
+            <Route
               path="/update-password"
               element={<UpdatePasswordPage />} />
             <Route
@@ -100,6 +104,13 @@ function App() {
               } />
             <Route
               path="/admin/categories/new"
+              element={
+                <AdminRoute>
+                  <AdminCreateCategoryPage />
+                </AdminRoute>
+              } />
+            <Route
+              path="/admin/categories/edit/:id"
               element={
                 <AdminRoute>
                   <AdminCreateCategoryPage />

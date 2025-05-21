@@ -52,7 +52,7 @@ const Header = ({ cartCount = 0 }) => {
               <NavLink className="nav-link" to="/products" end>
                 Produtos
               </NavLink>
-              <NavLink className="nav-link" to="/admin/categories" end>
+              <NavLink className="nav-link" to="/categories" end>
                 Categorias
               </NavLink>
               <a className="nav-link" href="/about">Quem Somos</a>
@@ -78,7 +78,7 @@ const Header = ({ cartCount = 0 }) => {
                       <>
                         <li><Link className="dropdown-item" to="/admin/users">Usuários</Link></li>
                         <li><Link className="dropdown-item" to="/admin/products">Produtos</Link></li>
-                        <li><Link className="dropdown-item" to="/admin/categorys">Categorias</Link></li>
+                        <li><Link className="dropdown-item" to="/admin/categories">Categorias</Link></li>
                         <li><hr className="dropdown-divider" /></li>
                       </>
                     )}

@@ -54,12 +54,18 @@ const AdminCategoriesPage = () => {
   };
 
   return (
-    <div>
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2>Categorias</h2>
-        <a href="/admin/categories/new" className="btn btn-success">
-          <i className="bi bi-plus-lg"></i> Nova Categoria
-        </a>
+    <div className="container-fluid px-2 px-md-4">
+      <div className="row">
+        <div className="col-12">
+          <h2 className="text-center mb-3">Categorias</h2>
+        </div>
+      </div>
+      <div className="row mb-3">
+        <div className="col-12 d-flex justify-content-center">
+          <a href="/admin/categories/new" className="btn btn-success">
+            <i className="bi bi-plus-lg"></i> Nova Categoria
+          </a>
+        </div>
       </div>
       {isLoading && (
         <div className="text-center my-5">
@@ -76,87 +82,88 @@ const AdminCategoriesPage = () => {
         </div>
       )}
       {!isLoading && !isError && data && (
-        <>
-          <table className="table table-striped">
+        <div className="table-responsive">
+          <table className="table table-striped align-middle">
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Nome</th>
-                <th>Ações</th>
+                <th className="text-end" style={{ minWidth: 140 }}>Ações</th>
               </tr>
             </thead>
             <tbody>
               {data.categories?.length === 0 && (
                 <tr>
-                  <td colSpan={3} className="text-center">
+                  <td colSpan={2} className="text-center">
                     Nenhuma categoria encontrada.
                   </td>
                 </tr>
               )}
               {data.categories?.map((cat) => (
                 <tr key={cat.id}>
-                  <td>{cat.id}</td>
                   <td>{cat.category_name}</td>
-                  <td>
-                    <a
-                      href={`/admin/categories/edit/${cat.id}`}
-                      className="btn btn-sm btn-primary me-2"
-                    >
-                      <i className="bi bi-pencil"></i> Editar
-                    </a>
-                    <button
-                      className="btn btn-sm btn-danger"
-                      onClick={() => handleDelete(cat.id)}
-                      disabled={deleteCategoryMutation.isLoading}
-                    >
-                      <i className="bi bi-trash"></i> Excluir
-                    </button>
+                  <td className="text-end">
+                    <div className="d-inline-flex flex-column flex-sm-row gap-2">
+                      <a
+                        href={`/admin/categories/edit/${cat.id}`}
+                        className="btn btn-sm btn-primary"
+                      >
+                        <i className="bi bi-pencil"></i> <span className="d-none d-sm-inline">Editar</span>
+                      </a>
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => handleDelete(cat.id)}
+                        disabled={deleteCategoryMutation.isLoading}
+                      >
+                        <i className="bi bi-trash"></i> <span className="d-none d-sm-inline">Excluir</span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          {/* Paginação */}
-          <nav>
-            <ul className="pagination justify-content-center">
-              <li className={`page-item${page === 1 ? " disabled" : ""}`}>
-                <button
-                  className="page-link"
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                >
-                  Anterior
-                </button>
-              </li>
-              {Array.from({ length: data.totalPages || 1 }, (_, i) => (
-                <li
-                  key={i + 1}
-                  className={`page-item${page === i + 1 ? " active" : ""}`}
-                >
-                  <button className="page-link" onClick={() => setPage(i + 1)}>
-                    {i + 1}
-                  </button>
-                </li>
-              ))}
-              <li
-                className={`page-item${page === data.totalPages ? " disabled" : ""
-                  }`}
+        </div>
+      )}
+      {/* Paginação */}
+      {!isLoading && !isError && data && (
+        <nav>
+          <ul className="pagination justify-content-center flex-wrap">
+            <li className={`page-item${page === 1 ? " disabled" : ""}`}>
+              <button
+                className="page-link"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
               >
-                <button
-                  className="page-link"
-                  onClick={() =>
-                    setPage((p) =>
-                      Math.min(data.totalPages || 1, p + 1)
-                    )
-                  }
-                  disabled={page === data.totalPages}
-                >
-                  Próxima
+                Anterior
+              </button>
+            </li>
+            {Array.from({ length: data.totalPages || 1 }, (_, i) => (
+              <li
+                key={i + 1}
+                className={`page-item${page === i + 1 ? " active" : ""}`}
+              >
+                <button className="page-link" onClick={() => setPage(i + 1)}>
+                  {i + 1}
                 </button>
               </li>
-            </ul>
-          </nav>
-        </>
+            ))}
+            <li
+              className={`page-item${page === data.totalPages ? " disabled" : ""}`}
+            >
+              <button
+                className="page-link"
+                onClick={() =>
+                  setPage((p) =>
+                    Math.min(data.totalPages || 1, p + 1)
+                  )
+                }
+                disabled={page === data.totalPages}
+              >
+                Próxima
+              </button>
+            </li>
+          </ul>
+        </nav>
       )}
     </div>
   );
